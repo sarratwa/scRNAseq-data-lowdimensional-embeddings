@@ -31,7 +31,7 @@ At the current stage, emphasis is placed on validating steps 1–6 before scalin
 
 ## Repository Structure
 
-```text
+```
 scRNAseq-data-lowdimensional-embeddings/
 ├── README.md
 ├── environment.yml
@@ -56,7 +56,7 @@ scRNAseq-data-lowdimensional-embeddings/
 └── docs/
     ├── progress_log.md
     └── meeting_notes.md
-
+```
 
 ## Current Status
 
