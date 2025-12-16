@@ -1,4 +1,85 @@
-# Low-Dimensional Embeddings for Large-Scale scRNA-Seq Data
+# Low-Dimensional Embeddings for scRNA-seq Data
 
-Scalable preprocessing and low-dimensional embeddings (PCA, UMAP, TorchDR) for large-scale single-cell RNA-seq (scRNA-seq) datasets using CELLxGENE, Scanpy, and PyTorch.
+This project explores preprocessing and low-dimensional embeddings for single-cell RNA sequencing (scRNA-seq) data, with a focus on scalability and interpretability. The analysis is conducted using datasets from the CELLxGENE Census and standard single-cell analysis tools such as Scanpy, with exploratory integration of TorchDR for scalable dimensionality reduction.
 
+
+
+## Project Scope and Motivation
+
+Single-cell RNA-seq datasets are characterized by extremely high dimensionality, sparsity, and technical noise. Dimensionality reduction is therefore a crucial step for downstream analysis such as visualization and clustering. However, embedding results are highly sensitive to preprocessing decisions and algorithmic parameters.
+
+This project investigates:
+- how preprocessing and quality control affect embeddings,
+- how classical methods (PCA, UMAP) behave on scRNA-seq data,
+- and how scalable approaches (e.g. TorchDR, incremental PCA) can be integrated for larger datasets.
+
+## Analysis Pipeline (Conceptual)
+
+The analysis follows a standard scRNA-seq workflow:
+
+1. Data acquisition from CELLxGENE Census  
+2. Exploratory data analysis and metadata inspection  
+3. Quality control (cell- and gene-level filtering)  
+4. Normalization and log-transformation  
+5. Highly Variable Gene (HVG) selection  
+6. Principal Component Analysis (PCA)  
+7. Neighborhood graph construction  
+8. Non-linear embeddings (UMAP)  
+9. Exploratory integration of TorchDR for scalable dimensionality reduction  
+
+At the current stage, emphasis is placed on validating steps 1–6 before scaling experiments.
+
+## Repository Structure
+
+scRNAseq-data-lowdimensional-embeddings/
+├── README.md
+├── environment.yml
+├── .gitignore
+├── data/                  
+│   ├── raw/
+│   └── processed/
+├── notebooks/             
+│   ├── 01_load_and_eda.ipynb
+│   ├── 02_qc_preprocess.ipynb
+│   └── 03_pca_umap_torchdr.ipynb
+├── src/
+│   ├── __init__.py
+│   ├── load_data.py
+│   ├── dataset_summary.py
+│   ├── preprocessing.py
+│   └── dr.py
+├── figures/
+│   ├── qc_*.png
+│   ├── pca_*.png
+│   └── umap_*.png
+└── docs/
+    ├── progress_log.md
+    └── meeting_notes.md
+
+
+---
+
+## Current Status
+
+- [x] Project structure and environment setup  
+- [x] Data loading and metadata inspection  
+- [ ] Exploratory data analysis and QC refinement (in progress) 
+- [ ] PCA-based dimensionality reduction and interpretation (in progress) 
+- [ ] TorchDR integration (planned) 
+- [ ] Large-scale benchmarking (future work) 
+
+All active development takes place on the `dev` branch. The `main` branch is kept as a clean, stable reference.
+
+
+## Reproducibility and Environment
+
+The analysis is developed and tested under the following conditions:
+- OS: Ubuntu (WSL2)
+- Python: Conda-based environment
+- Key libraries: Scanpy, AnnData, PyTorch, TorchDR
+
+To recreate the environment:
+
+```bash
+conda env create -f environment.yml
+conda activate census
