@@ -13,7 +13,7 @@ This project investigates:
 - how classical methods (PCA, UMAP) behave on scRNA-seq data,
 - and how scalable approaches (e.g. TorchDR, incremental PCA) can be integrated for larger datasets.
 
-## Analysis Pipeline (Conceptual)
+## Analysis Pipeline
 
 The analysis follows a standard scRNA-seq workflow:
 
