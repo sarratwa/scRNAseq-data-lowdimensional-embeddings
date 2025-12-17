@@ -13,7 +13,7 @@ This project investigates:
 - how classical methods (PCA, UMAP) behave on scRNA-seq data,
 - and how scalable approaches (e.g. TorchDR, incremental PCA) can be integrated for larger datasets.
 
-## Analysis Pipeline (Conceptual)
+## Analysis Pipeline
 
 The analysis follows a standard scRNA-seq workflow:
 
@@ -31,6 +31,7 @@ At the current stage, emphasis is placed on validating steps 1–6 before scalin
 
 ## Repository Structure
 
+```
 scRNAseq-data-lowdimensional-embeddings/
 ├── README.md
 ├── environment.yml
@@ -55,9 +56,7 @@ scRNAseq-data-lowdimensional-embeddings/
 └── docs/
     ├── progress_log.md
     └── meeting_notes.md
-
-
----
+```
 
 ## Current Status
 
