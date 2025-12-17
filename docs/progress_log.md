@@ -15,18 +15,13 @@ and next steps.
 ### Next steps
 - 
 
-## After YYYY-MM-DD
+## After 27-11-2025
 
 ### Work done
-- 
+- account for variance mean dispersion and fix plot and filter out cells
+- focus on the DR section
 
-### Observations / issues
-- 
-
-### Next steps
-- 
-
-## After 11-12-2025
+## After 04-12-2025
 
 ### Work done
 - research into:
@@ -34,14 +29,11 @@ and next steps.
     - UMAP / t-SNE: preserve local neighborhoods ...
     - TorchDR: same math goal as PCA but is incremental and GPU-based
 
-### Observations / issues
-- 
-
 ### Next steps
 - studying the influence of these methods on the apperance of the structure, interpreting the result and verfiying its reproducibilty
 
 
-## After 18-12-2025
+## After 11-12-2025
 
 ### Work done
 - 
