@@ -77,8 +77,21 @@ The analysis is developed and tested under the following conditions:
 - Python: Conda-based environment
 - Key libraries: Scanpy, AnnData, PyTorch, TorchDR
 
+This project uses a Conda-based Python environment.
+
+Main dependencies include:
+- Python 3.11
+- scanpy
+- cellxgene-census
+- numpy, pandas, matplotlib
+- PyTorch (for TorchDR experiments)
+
 To recreate the environment:
 
 ```bash
 conda env create -f environment.yml
 conda activate census
+```
+This project uses the CELLxGENE Census as the primary data source for large-scale single-cell RNA-seq datasets.
+The Census API provides programmatic access to curated scRNA-seq data stored in a cloud-backed TileDB-SOMA format.
+Please follow the official installation instructions: [https://chanzuckerberg.github.io/cellxgene-census/cellxgene_census_docsite_installation.html]
