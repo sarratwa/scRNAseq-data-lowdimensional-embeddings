@@ -31,6 +31,8 @@ At the current stage, emphasis is placed on validating steps 1–6 before scalin
 
 ## Repository Structure
 
+The structure is being updated as i progress, so this is not the final overview
+
 ```
 scRNAseq-data-lowdimensional-embeddings/
 ├── README.md
