@@ -8,24 +8,179 @@ Each entry records feedback, decisions, and agreed action items.
 ## Meeting – 13-10-2025
 
 **Focus of meeting**
-- 
-
-**What I presented**
-- 
+- Introduction to the research thema
 
 **Supervisor feedback**
-- 
+- Dimensionality reduction is an early but critical step for:
+    - batching
+    - clustering
+    - exploratory analysis
+- The goal is to understand how to represent high-dimensional scRNA-seq data in low dimensions (e.g. 20k genes → 2D).
+- Dataset source:
+    - CELLxGENE
+- Dataset characteristics:
+    - scRNA-seq data
+    - annotated cells
+    - disease-related samples:
+        - epilepsy
+        - Alzheimer’s
+        - brain disease distribution
+- Possible tissues:
+    - brain (focus)
+    - liver or other tissues (mentioned as alternatives)
+- Data access:
+    - use APIs for the dataset
+    - download data programmatically
+- Data format:
+    - annotations are available
+    - cell metadata exists
+- Tasks:
+    - load the data
+    - understand where the data comes from
+    - inspect dataset metadata
+- Perform exploratory statistics before modeling
+- Goals:
+    - understand dataset composition
+    - inspect distributions
+- Analyses:
+    - cell type categories and counts
+    - descriptive statistics
+    - distribution of cells across categories
+    - gene expression summaries
+- Visualizations:
+    - bar plots (e.g. brain vs liver, cell types)
+    - frequency plots
+- Tools:
+    - Python
+    - pandas DataFrames
+- Questions:
+    - what annotations exist?
+    - are annotations reasonable?
+    - how many cells per type?
+    - how many genes?
+- Gene expression analysis:
+    - genes in common
+    - frequency of genes in the expression matrix
+- Inspect:
+    - how often genes appear across cells
+    - sparsity patterns
+- Data handling:
+    - represent gene expression in tabular form (pandas)
+- Goal:
+    - understand structure of the gene–cell matrix
+- Filter the dataset:
+    - filter cells
+    - filter genes
+- Reasons for filtering:
+    - memory constraints
+    - computational feasibility
+- Subsetting:
+    - create a submatrix (e.g. brain cells only)
+- Focus:
+    - reduce dataset size before advanced analysis
+- Preparation steps:
+    - get obs (cell metadata)
+    - get var (gene metadata)
+    - ensure data is “analysis-ready”
+- 2 analysis pathways:
+- Path A: Scanpy (classical pipeline)
+    - Use Scanpy for:
+        - clustering
+        - classical dimensionality reduction
+    - Strategy:
+        - initially ignore annotations
+        - focus on intrinsic data structure
+    - Questions:
+        - can cells be grouped?
+        - do clusters correspond to known cell types?
+    -   Additional steps:
+        - batch correction
+        - data batching
+- Path B: TorchDR (deep learning / scalable DR)
+    - Use TorchDR for:
+        - dimensionality reduction
+        - scalability experiments
+    - Motivation:
+        - memory limitations on GPU
+        - large datasets cannot always be processed at once
+    - Core question:
+        - how do we represent ~20k features in 2D?
+    - Methods:
+        - PCA
+        - incremental PCA
+    - Characteristics:
+        - PCA transforms data into fewer dimensions
+        - fewer x/y parameters
+    - Limitations:
+        - memory problems on GPU
+    - Comparison goals:
+        - speed
+        - incremental processing
+        - scalability
+- Dimensionality reduction concepts
+    - PCA:
+        - Principal Component Analysis
+        - linear transformation
+        - reduces dimensionality
+    - Incremental PCA:
+        - processes data in batches
+        - suitable for large datasets
+    - Dimensionality reduction is:
+        - a prerequisite for clustering
+        - a visualization tool
+        - not the final biological result
+- Subsetting and sampling strategy:
+    - TorchDR applied to:
+        - a subset of the dataset (e.g. 20k cells)
+    - Tasks:
+        - describe what the data subset contains
+        - learn how to select the subset
+    - Considerations:
+        - representativeness
+        - computational limits
+- Infrastructure and env
+    - Tools and platforms:
+        - local machine
+        - Google Colab
+        - JupyterHub
+        - KI Werkstatt (HTW)
+    - Tasks:
+        - install required libraries
+        - check Scanpy tutorials
+    - Environment readiness:
+        - prepare for GPU usage
+        - handle memory constraints
+- Visualization & outputs
+    - Expected outputs:
+        - dimensionality reduction plots
+        - clustering visualizations
+    - Visual goals:
+        - clear 2D representations
+        - compare methods
+    - Notes:
+        - clusters may or may not align with annotations
+        - visualization is exploratory, not confirmatory
+- Compare:
+    - Scanpy-based DR
+    - TorchDR-based DR
+- Metrics:
+    - speed
+    - scalability
+    - feasibility
+- Testing:
+    - fast vs incremental methods
+    - performance under larger data sizes
+- Overall Workflow:
+    - Load data via CELLxGENE API
+    - Explore metadata and basic statistics
+    - Filter cells and genes
+    - Subset data for feasibility
+    - Run classical Scanpy pipeline
+    - Run TorchDR / incremental PCA
+    - Visualize and compare embeddings
+    - Reflect on scalability and limitations
 
-**Key decisions / clarifications**
-- 
-
-**Action items**
-- [ ] 
-- [ ] 
-
----
-
-## Meeting – 20-10-2025
+## Meeting – 27-10-2025
 
 **Focus of meeting**
 - 
