@@ -49,13 +49,13 @@ if tissue_counts is not None:
     plt.tight_layout()
     plt.show()
 
-# -------- Table view for screenshot --------
+# -------- Table view  --------
 summary_table = pd.DataFrame({
     "Metric": ["Cells", "Genes", "Matrix Type", "Metadata Columns"],
     "Value": [adata.n_obs, adata.n_vars, type(adata.X).__name__, len(adata.obs.columns)]
 })
 
 print("\n============================================")
-print("Summary Table (also good for screenshot)")
+print("Summary Table")
 print("============================================")
 print(summary_table)
