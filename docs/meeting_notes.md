@@ -183,74 +183,151 @@ Each entry records feedback, decisions, and agreed action items.
 ## Meeting – 27-10-2025
 
 **Focus of meeting**
-- 
+- Preprocessing
 
 **What I presented**
-- 
+- load_data.py and explained the switch from native Windows to WSL
 
 **Supervisor feedback**
-- 
+- Switch to google collab or KI wersktatt
+- 1.Preprocessing goals
+    - Primary objective: filter and reduce the dataset to a form suitable for downstream dimensionality reduction
+    - Emphasis on:
+        - computational feasibility (memory, RAM)
+        - meaningful signal extraction
+        - avoiding uninformative features
+- 2.Gene-level filtering
+    - Perform filtering at the gene level
+    - Restrict analysis to protein-coding genes
+        - Motivation:
+            - reduce feature space
+            - improve interpretability
+            - limit noise
+    - Typical scale:
+        - ~50,000 genes initially
+        - reduced to protein-coding subset
 
-**Key decisions / clarifications**
-- 
+- 3.Cell-level focus and biological context
+    - Focus on human brain cells
+    - Disease context includes:
+        - Alzheimer’s disease
+        - Epilepsy
+    - Interest in:
+        - specific cell subtypes (e.g. neuronal cells)
+    - Subselection of cells based on:
+        - tissue type
+        - disease relevance
+        - analysis goals
 
-**Action items**
-- [ ] 
-- [ ] 
+- 4.Highly Variable Genes (HVGs)
+    - Further reduce the gene set by selecting highly variable genes
+    - Rationale:
+        - retain genes that vary meaningfully across cells
+        - remove uninformative genes that show little change
+    - Use Scanpy’s HVG selection:
+        - based on mean–variance (dispersion) relationships
+    - Outcome:
+        - stabilize downstream PCA
+        - reduce noise
+
+- 5.Read counts and bioinformatics considerations
+    - Read counts are a central measure in scRNA-seq data
+    - Bioinformatics preprocessing maps:
+        - raw read counts
+        - gene expression profiles
+    - Need to understand:
+        - how read depth influences variance
+        - how filtering affects biological signal
+
+- 6.Dimensionality reduction through feature reduction
+    - Reduce the number of columns (genes) in the data matrix
+    - Example:
+        - from ~100,000 × 50,000 to ~100,000 × 5,000
+    - This step is necessary to:
+        - enable PCA
+        - reduce memory usage
+        - improve runtime
+- 7.Scanpy-based preprocessing strategy
+    - Study Scanpy preprocessing tutorials in detail
+    - Use Scanpy to:
+        - identify highly variable genes
+        - normalize data
+        - prepare data for PCA
+    - Ensure correct preprocessing order before dimensionality reduction
+- 8.Subsampling for computational feasibility
+    - Use random subsets of cells when needed
+    - Motivation:
+        - limited computing power
+        - large-scale datasets
+    - Subsampling is used as:
+        - a practical compromise
+        - a testbed for methods
+- 9.Exploratory plots and diagnostics
+    - Generate plots to validate preprocessing choices:
+        - histograms of gene expression
+        - distribution of highly variable genes
+        - variance-related diagnostics
+    - These plots serve as: 
+        - sanity checks
+        - evidence of understanding preprocessing effects
+
+- 10.Zwischenbericht (intermediate report)
+    - The intermediate report should:
+        - illustrate preprocessing decisions
+        - demonstrate understanding of the data
+        - include relevant plots (e.g. histograms)
+    - Target length:
+        - approximately 1 page
+    - Focus:
+        - explanation, not results
+        - clarity over completeness
 
 ## Meeting – 06-11-2025
 
 **Focus of meeting**
-- 
+- Feedback on current progress
 
 **What I presented**
-- 
+- mouse data download code
+- project set up locally
+- attempts at migrating to google collab
 
 **Supervisor feedback**
-- 
-
-**Key decisions / clarifications**
-- 
-
-**Action items**
-- [ ] 
-- [ ] 
+- Overall assessment
+    - Working with mouse data was explicitly discouraged:
+        - The project focus must remain on human scRNA-seq data.
+        - Mouse datasets may only be used for isolated technical tests, not for core analysis.
+    - Manual dataset downloads (e.g. downloading .h5ad files via the browser) were discouraged:
+        - The workflow should remain API-driven and reproducible.
+    - Loading datasets by manually copying dataset IDs into code was considered suboptimal:
+        - While technically functional, this approach was described as “half-automated”.
+        - Preference was given to workflows that programmatically query and select datasets.
+- Feedback on data aquisition strategy
+    - Google Colab was suggested as a possible environment for scalability testing, but:
+        - The observed memory crashes were acknowledged.
+        - It was emphasized that infrastructure limitations should be explicitly documented, not worked around silently.
+    - The importance of GPU-aware thinking was stressed:
+        - Even if GPU resources are not currently available, the pipeline should be designed with GPU execution in mind.
+        - TorchDR was highlighted as relevant primarily in the context of batching and GPU-based scalability.
+    - KI-Werkstatt was suggested as a more suitable environment for future large-scale experiments.
+- Feedback on infrastructure and scalability
+- Expectations for next iteration
 
 ## Meeting – 13-11-2025
 
 **Focus of meeting**
-- 
+- show progress
+- ask about the prefered structure for the zwischenbericht
 
 **What I presented**
-- 
+- the subset of 3k cells and subsetting criteria 
+- the local, subset-based workflow
+- preliminary dataset inspection
 
 **Supervisor feedback**
-- 
-
-**Key decisions / clarifications**
-- 
-
-**Action items**
-- [ ] 
-- [ ] 
-
-## Meeting – 20-11-2025
-
-**Focus of meeting**
-- 
-
-**What I presented**
-- 
-
-**Supervisor feedback**
-- 
-
-**Key decisions / clarifications**
-- 
-
-**Action items**
-- [ ] 
-- [ ] 
+- Initial 3k subset could be used initially.
+- Preprocessing and variance diagnostics are th next step: scanpy tutorials
+- The structure of the zwischenbericht should be as follow: abstract + introduction + env + methods and handling progress + exploratory stat analysis and visualization and conclusion. This will not be the final bericht s structure as this does not cover dr yet which is the meat of the problem. This covers current progress; working API access, a sampled dataset, summary tables, one figure and some first statistics. Must include a research question, a clear decription of methods and a concrete interpertation of final results for this stage.
 
 ## Meeting – 27-11-2025
 
