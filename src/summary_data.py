@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # -------- Load data --------
+# only after running load_data.py and obtaining the h5ad file of the data
 adata = sc.read_h5ad("data/processed/brain_3000_sample.h5ad")
 
 print("============================================")
@@ -20,7 +21,7 @@ print("============================================\n")
 # -------- Cell type distribution --------
 if "tissue" in adata.obs.columns:
     tissue_counts = adata.obs["tissue"].value_counts()
-    print("🧠 Tissue distribution:")
+    print("Tissue distribution:")
     print(tissue_counts)
 else:
     tissue_counts = None
@@ -34,7 +35,7 @@ gene_means = np.asarray(adata.X.mean(axis=0)).ravel()
 top_gene_indices = gene_means.argsort()[-10:][::-1]
 top_genes = adata.var.index[top_gene_indices].tolist()
 
-print("\n🔥 Top 10 detected genes (by mean expression):")
+print("\nTop 10 detected genes (by mean expression):")
 for g in top_genes:
     print(" -", g)
 
@@ -55,6 +56,6 @@ summary_table = pd.DataFrame({
 })
 
 print("\n============================================")
-print("📋 Summary Table (also good for screenshot)")
+print("Summary Table (also good for screenshot)")
 print("============================================")
 print(summary_table)
