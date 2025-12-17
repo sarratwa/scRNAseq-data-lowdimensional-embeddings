@@ -72,10 +72,16 @@ All active development takes place on the `dev` branch. The `main` branch is kep
 
 ## Reproducibility and Environment
 
-The analysis is developed and tested under the following conditions:
-- OS: Ubuntu (WSL2)
-- Python: Conda-based environment
-- Key libraries: Scanpy, AnnData, PyTorch, TorchDR
+All experiments were conducted on a local machine using WSL2 (Ubuntu) with the following hardware configuration:
+
+- CPU: Intel Core i7-10870H
+- RAM: 32 GB
+- GPU: NVIDIA GeForce RTX 3050, 4 GB VRAM
+- CUDA: Version 13.0 (available via WSL2)
+- OS: Windows 11 with Ubuntu (WSL2)
+
+-> GPU acceleration was available and used where supported (TorchDR). However, the limited VRAM (4 GB) constrained the maximum dataset size, motivating the use of subsampling and incremental methods.
+
 
 This project uses a Conda-based Python environment.
 
@@ -93,5 +99,5 @@ conda env create -f environment.yml
 conda activate census
 ```
 This project uses the CELLxGENE Census as the primary data source for large-scale single-cell RNA-seq datasets.
-The Census API provides programmatic access to curated scRNA-seq data stored in a cloud-backed TileDB-SOMA format.
-Please follow the official installation instructions: [https://chanzuckerberg.github.io/cellxgene-census/cellxgene_census_docsite_installation.html]
+- The Census API provides programmatic access to curated scRNA-seq data stored in a cloud-backed TileDB-SOMA format.
+- Please follow the official installation instructions: [https://chanzuckerberg.github.io/cellxgene-census/cellxgene_census_docsite_installation.html]
