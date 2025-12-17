@@ -402,35 +402,131 @@ Each entry records feedback, decisions, and agreed action items.
 ## Meeting – 11-12-2025
 
 **Focus of meeting**
-- 
+- Dimensionality Reduction, PCA, and QC Interpretation
 
 **What I presented**
-- 
+- Implemented a complete preprocessing and initial dimensionality reduction pipeline for a subsampled scRNA-seq dataset using Scanpy. 
+- The focus was on correct quality control, normalization, highly variable gene (HVG) selection, and exploratory dimensionality reduction (PCA, UMAP, t-SNE). 
+- At this stage, the workflow closely follows official Scanpy preprocessing tutorials to ensure methodological correctness, while interpretative confidence is still being developed.
 
 **Supervisor feedback**
-- 
-
-**Key decisions / clarifications**
-- 
-
-**Action items**
-- [ ] 
-- [ ] 
+- 1.PCA fundamentals and interpretation
+    - PCA projects high-dimensional data onto orthogonal axes (principal components), typically visualized as x- and y-axes in 2D plots.
+    - PCA axes do not necessarily start at zero, and this is expected behavior.
+    - PCA requires proper scaling and normalization; otherwise, misleading structures may appear.
+    - The first principal component (PC1) explains the largest proportion of variance in the data.
+    - Each subsequent component explains a decreasing fraction of the remaining variance.
+- 2.Explained variance and component selection
+    - The proportion of explained variance per principal component must be explicitly examined.
+    - A cumulative explained variance plot should be used to determine:
+        - how many principal components are required
+        - what percentage of variance should be retained
+    - Common practice:
+        - inspect the first ~30–50 components
+        - select the number of PCs that explain a sufficiently large proportion of variance (e.g. 70–90%), depending on the downstream task
+    - The number of PCs retained influences:
+        - clustering quality
+        - neighborhood graph construction
+        - downstream dimensionality reduction (UMAP, t-SNE, TorchDR)
+- 3.Scaling considerations and dataset size
+    - Scaling behavior is not primarily determined by the number of cells alone.
+    - Computational complexity depends on the ratio between number of samples (cells) and number of features (genes).
+    - Increasing the number of cells does not necessarily increase the number of features.
+    - Highly Variable Gene (HVG) selection is therefore critical:
+        - it stabilizes PCA
+        - it keeps the feature space fixed as the dataset grows
+    - This distinction is essential when reasoning about scalability.
+- 4.PCA computation and TorchDR integration
+    - PCA must be computed correctly before applying TorchDR.
+    - TorchDR can be used:
+        - on top of PCA embeddings
+        - with incremental PCA for large datasets
+    - Incremental PCA is especially relevant when:
+        - memory limits are reached
+        - GPU resources are constrained
+    - TorchDR is motivated by:
+        - scalability concerns
+        - batching
+        - GPU acceleration
+- 5.Cell filtering and zero-expression issues
+    - Cells with zero or near-zero gene expression should be removed prior to PCA.
+    - Such cells can:
+        - distort variance estimates
+        - appear as artificial outliers in embeddings
+    - Filtering decisions must be justified and documented.
+- 6.Gene variability and HVG selection
+    - Gene variability should be assessed using dispersion-based measures.
+    - Highly Variable Genes (HVGs):
+        - show meaningful variation across cells
+        - often define biological cell types
+    - HVG selection plots must be interpreted carefully:
+        - the goal is not aesthetics but variance structure
+    - Improper HVG selection leads to unstable PCA and misleading embeddings.
+- 7.Outliers, dead cells, and biological vs technical interpretation
+    - PCA and downstream embeddings may reveal apparent outliers.
+    - These outliers can correspond to:
+        - dying or stressed cells
+        - technical artifacts
+        - biologically interesting rare populations
+    - Important clarification:
+        - healthy donors can still contain dying cells
+        - this is normal and expected
+    - The presence of outliers alone does not justify removal without further investigation.
+- 8.Mitochondrial gene content and QC thresholds
+    - QC plots for mitochondrial gene expression are critical.
+    - Cells with very high mitochondrial percentages (e.g. >50%) are often:
+        - dying
+        - stressed
+    - However:
+        - rigid thresholds should be applied cautiously
+        - biological context matters
+    - The decision to remove such cells must be explicitly reasoned, not automatic.
+- 9.Total counts and doublets
+    - Cells with unusually high total read counts (e.g. 80,000 vs typical 10,000) require inspection.
+    - High read counts may indicate:
+        - doublets (two cells captured together)
+        - technical artifacts during droplet-based sequencing
+    - Doublets arise when:
+        - more than one cell is encapsulated in a single droplet
+    - These artifacts manifest as:
+        - dense “bubbles” or isolated points in embeddings
+        - gray or unannotated outliers 
+- 10.Droplet sequencing and experimental artifacts
+    - Droplet-based scRNA-seq operates at the nanogram scale.
+    - Sample preparation steps (e.g. buffer solutions, RNA extraction) are error-prone.
+    - Errors introduced before or during sequencing propagate into:
+        - gene expression measurements
+        - downstream analyses
+    - These technological artifacts should be explicitly acknowledged.
+- 11.Importance for introduction and discussion
+    - The impact of sequencing technology and preprocessing artifacts should be highlighted in the introduction.
+    - Emphasize:
+        - how fragile the measurement process is
+        - why careful QC and preprocessing are essential
+    - These considerations justify:
+        - cautious interpretation of embeddings
+        - focus on methodology rather than biological claims
+- 12.Visualization and storytelling
+    - PCA and DR plots are not just technical outputs; they tell a story.
+    - For each plot, you should be able to explain:
+        - what structure is visible
+        - what could be biological
+        - what could be technical
+    - Gray or uncolored points should be questioned:
+        - why do they appear?
+        - what metadata do they lack?
+    - These discussions sit at the intersection of:
+        - biology
+        - data science
+        - experimental technology
 
 ## Meeting – 18-12-2025
 
 **Focus of meeting**
-- calculating the PCA and torchDR
+- 
 
 **What I presented**
 - 
 
 **Supervisor feedback**
 - 
-
-**Key decisions / clarifications**
-- 
-
-**Action items**
-- [ ] 
-- [ ] 

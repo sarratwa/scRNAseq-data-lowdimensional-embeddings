@@ -172,10 +172,50 @@ and next steps.
 ## After 11-12-2025
 
 ### Work done
-- 
+- Loaded a pre-extracted brain subset (brain_3000_sample.h5ad) using sc.read_h5ad
+- Worked on a reduced dataset to enable fast iteration and debugging of preprocessing steps
+- Annotated mitochondrial genes based on gene name prefix (MT-)
+- Computed standard QC metrics using sc.pp.calculate_qc_metrics
+- Filtered low-quality cells based on:
+    - minimum number of detected genes (n_genes_by_counts > 200)
+    - mitochondrial read fraction (pct_counts_mt < 5)
+- Filtered genes detected in fewer than 3 cells to remove uninformative features
+-> These steps follow standard scRNA-seq QC practices and aim to remove technical noise before downstream analysis.
+- Applied total-count normalization (target_sum = 1e4)
+- Performed log-transformation using sc.pp.log1p
+- Identified highly variable genes using Scanpy’s Seurat-style method
+- Extracted mean expression and dispersion values from adata.var
+- Created a custom mean–dispersion plot:
+- non-HVGs shown in gray
+- HVGs highlighted in red
+- Used log–log scaling to better visualize the mean–variance relationship
+- Computed PCA using the ARPACK solver
+- Generated:
+    - PCA scatter plots
+    - variance ratio plots (log-scaled)
+- Used these plots to guide the selection of the number of principal components
+- Visualized PCA embeddings colored by QC metrics (pct_counts_mt, n_genes_by_counts) to identify potential technical structure
 
 ### Observations / issues
-- 
+- The preprocessing pipeline is implemented following Scanpy best practices and tutorials.
+- While the code runs correctly and produces expected outputs, my current understanding of what constitutes a “good” versus “problematic” HVG, PCA, or UMAP plot is still developing.
+- At this stage, I rely on:
+    - official Scanpy tutorials
+    - consistency with recommended workflows
+- Further work is needed to:
+    - better interpret variance structures
+    - identify preprocessing artifacts visually
+    - justify filtering thresholds more confidently
 
 ### Next steps
-- 
+- Understand why PCA and HVG selection behave as they do.
+- Justify all filtering decisions.
+- Distinguish clearly between:
+- biological signal
+- technical artifacts
+- Use TorchDR and incremental PCA as scalability tools, not black boxes.
+- Demonstrate interpretability, not just implementation.
+
+## After 18-12-2025
+
+### Work done
