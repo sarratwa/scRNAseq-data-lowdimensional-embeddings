@@ -330,6 +330,7 @@ dependencies:
       - statsmodels==0.14.5
       - threadpoolctl==3.6.0
       - tiledbsoma==2.1.0
+      - torchdr ==0.3
       - tqdm==4.67.1
       - umap-learn==0.5.9.post2
       - wrapt==1.17.3
