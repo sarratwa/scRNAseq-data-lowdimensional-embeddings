@@ -26,6 +26,9 @@ adata = adata.copy()  # important if this is a view
 adata.var_names = adata.var["feature_name"].astype(str)
 adata.var_names_make_unique()
 
+# need to rename the column of feature name because it raised a conflict later in dr: ValueError: DataFrame.index.name ('feature_name') is also used by a column whose values are different. This is not supported. Please make sure the values are the same, or use a different name.
+adata.var.rename(columns={"feature_name": "gene_symbol"}, inplace=True)
+
 # First let s mark the mitochondrial genes, "MT-" for human
 adata.var["mt"] = adata.var_names.str.startswith("MT-")
 
