@@ -71,6 +71,10 @@ scRNAseq-data-lowdimensional-embeddings/
 
 All active development takes place on the `dev` branch. The `main` branch is kept as a clean, stable reference.
 
+## Data
+
+- Due to size constraints, raw and processed scRNA-seq data files (`.h5ad`) are not included in this repository.
+- The directory structure is preserved, and all data can be re-generated using the provided scripts via the CELLxGENE Census API.
 
 ## Reproducibility and Environment
 

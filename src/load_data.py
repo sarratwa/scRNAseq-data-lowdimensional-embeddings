@@ -12,7 +12,7 @@ import tiledbsoma as soma
 # --------- Data sampling of 3000 cells -----------------
 # --------- Runtime : 25 minutes --------------------
 '''
-OUTPUT_DIR = Path("data/processed")
+OUTPUT_DIR = Path("data/raw")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 OUTPUT_FILE = OUTPUT_DIR / "brain_3000_sample.h5ad"

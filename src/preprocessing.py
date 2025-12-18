@@ -5,7 +5,7 @@ import numpy as np
 # need to limit scaling to hvgs and copy te adata before filtering
 
 # --------- Load Data --------------
-adata = sc.read_h5ad("data/processed/brain_3000_sample.h5ad")
+adata = sc.read_h5ad("data/raw/brain_3000_sample.h5ad")
 
 # ---- Annotate mitochondrial genes --------------
 # focus on mitochondrial genes mt to indicate cell stress or death -> huge percentage indicates a low-quality cell
@@ -147,3 +147,6 @@ sc.pl.umap(adata, color=["n_genes_by_counts", "pct_counts_mt"])
 # ------t-SNE------------
 sc.tl.tsne(adata, n_pcs=30)
 sc.pl.tsne(adata, color=["n_genes_by_counts"])
+
+# saving the processed data to use ind dr
+adata.write("data/processed/brain_preprocessed.h5ad")

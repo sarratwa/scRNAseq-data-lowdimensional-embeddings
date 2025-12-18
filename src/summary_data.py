@@ -5,7 +5,7 @@ import numpy as np
 
 # -------- Load data --------
 # only after running load_data.py and obtaining the h5ad file of the data
-adata = sc.read_h5ad("data/processed/brain_3000_sample.h5ad")
+adata = sc.read_h5ad("data/raw/brain_3000_sample.h5ad")
 
 print("============================================")
 print("DATASET SUMMARY")
