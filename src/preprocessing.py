@@ -4,43 +4,68 @@ import numpy as np
 
 # need to limit scaling to hvgs and copy te adata before filtering
 
-# -------------------------------
-# 1. Load data
-# -------------------------------
+# --------- Load Data --------------
 adata = sc.read_h5ad("data/processed/brain_3000_sample.h5ad")
 
-# -------------------------------
-# 2. Annotate mitochondrial genes
-# -------------------------------
+# ---- Annotate mitochondrial genes --------------
+# focus on mitochondrial genes mt to indicate cell stress or death -> huge percentage indicates a low-quality cell
 adata.var["mt"] = adata.var_names.str.startswith("MT-")
 
-# -------------------------------
-# 3. Compute QC metrics
-# -------------------------------
+# ------ Compute QC metrics ---------------
+# these qc statistics are essential for filtering and they add 
+# adata.obs
+# ------- n_genes_by_counts (how many genes are detectedin each cell)
+# ------- total_counts (total UMIs(Unique Molecular Identifier) per cell )
+# ------- pct_counts_mt (% of counts from mitochondrial genes)
+# adata.var
+# -------- n_cells_by_counts (how many cells express this gene)
+
+# redirect scanpy to the actual adata var names
+adata = adata.copy()  # important if this is a view
+
+adata.var_names = adata.var["feature_name"].astype(str)
+adata.var_names_make_unique()
+
+# First let s mark the mitochondrial genes, "MT-" for human
+adata.var["mt"] = adata.var_names.str.startswith("MT-")
+
 sc.pp.calculate_qc_metrics(
     adata,
     qc_vars=["mt"],
     inplace=True
 )
 
-# -------------------------------
-# 4. Filter low-quality cells
-# -------------------------------
+# Violin plots: univariate QC metrics
+sc.pl.violin(
+    adata,
+    ["n_genes_by_counts", "total_counts", "pct_counts_mt"],
+    jitter=0.4,
+    multi_panel=True
+)
+
+# does this dataset not have %mt?
+# print(adata.var_names[:10])
+# print(adata.var.head())
+# my mistake was using the scanpy adata.var_names but the gene names existed in adata.var[feature_name]
+
+# ------ Filter low-quality cells -------------------
+# cells with less than 200 genes are likely empty droplets
+# cells with more than 5% mt RNA are dying 
 adata = adata[adata.obs["n_genes_by_counts"] > 200, :]
 adata = adata[adata.obs["pct_counts_mt"] < 5, :]
 
-# Filter genes detected in at least 3 cells
+#----------- Filter genes detected in at least 3 cells ---------- 
+# if these genes are expressed in fewer than 3 cells then they could be rare genes and they add noise 
 sc.pp.filter_genes(adata, min_cells=3)
 
-# -------------------------------
-# 5. Normalization + log-transform
-# -------------------------------
+# ----- Normalization + log-transform ---------------------
+# each cell is scaled to have 10k total counts to remove difference in sequencing depth
+# target sum here 1r4 = 10k is just a random number in order to scale to the same total
 sc.pp.normalize_total(adata, target_sum=1e4)
+# the log transformation compresses extreme value -> make distribution more Gaussian
 sc.pp.log1p(adata)
 
-# -------------------------------
-# 6. HVG detection (classical Seurat)
-# -------------------------------
+# ------ HVG detection (classical Seurat) ------------
 sc.pp.highly_variable_genes(
     adata,
     flavor="seurat",
@@ -48,17 +73,16 @@ sc.pp.highly_variable_genes(
     inplace=True
 )
 
-# Extract mean + dispersion
+# -------  Extract mean + dispersion ----------
+# select top 2000 genes with highest normalized dispersion
 means = adata.var["means"]
 dispersions = adata.var["dispersions"]
 hvg_mask = adata.var["highly_variable"]
 
-# -------------------------------
-# 7. Custom HVG PLOT 
-# -------------------------------
+# ----- Custom HVG PLOT --------------------
 plt.figure(figsize=(7,6))
 
-# non-HVGs in grey
+# --------- non-HVGs in grey ------------
 plt.scatter(
     means[~hvg_mask],
     dispersions[~hvg_mask],
@@ -67,7 +91,7 @@ plt.scatter(
     label="Other genes"
 )
 
-# HVGs in red
+# --------- HVGs in red ----------
 plt.scatter(
     means[hvg_mask],
     dispersions[hvg_mask],
@@ -85,20 +109,23 @@ plt.legend(frameon=False)
 plt.tight_layout()
 plt.show()
 
-# -------------------------------
-# Scale HVGs (needed for PCA)
-# -------------------------------
+# ------- Scale HVGs (needed for PCA)-----------------
+# For scaling we make sure each gene has mean = 0 and variance = 1
 sc.pp.scale(adata, max_value=10)
+# what if i limit scaling to hvgs?
+# sc.pp.scale(adata[:, adata.var.highly_variable])
 
-# -------------------------------
-# PCA
-# -------------------------------
+# ------ PCA -------------
+# we reduce these thousand of genes to components
 sc.tl.pca(adata, svd_solver='arpack')
+# pca scatter plot
 sc.pl.pca(adata, color=None)
 
-# Variance ratio plot (helps choose n_pcs)
+# --------- Variance ratio plot (helps choose n_pcs) --------
+# pc number and the % variance explained
+# which PCs explain little additional variance -> we will use 30 PCs
 sc.pl.pca_variance_ratio(adata, log=True)
-
+# these 2 plots are to check if PCs are strongly correlated with mitochondrial %
 sc.pl.pca(adata, color="pct_counts_mt")
 sc.pl.pca(
     adata,
@@ -108,34 +135,22 @@ sc.pl.pca(
     size=20,
 )
 
-# -------------------------------
-# Neighborhood graph
-# -------------------------------
-# Use 30 PCs unless variance plot suggests fewer
+# --- Neighborhood graph -------
+# Use 30 PCs because from PC1 to PC10 is a strong drop and then from PC10 to PC20 is gradual decline and until PC30 we still have a non zero signal
+# choosing less might make neighbor graphs incomplete
+# each cell is connected to its nearest neighbors
 sc.pp.neighbors(adata, n_pcs=30, n_neighbors=10)
 
-# -------------------------------
-# UMAP
-# -------------------------------
+# --- UMAP --------
 sc.tl.umap(adata)
 sc.pl.umap(adata, color=["n_genes_by_counts", "pct_counts_mt"])
-
+# ------t-SNE------------
 sc.tl.tsne(adata, n_pcs=30)
 sc.pl.tsne(adata, color=["n_genes_by_counts"])
 
 '''
-# -------- Load data --------
-adata = sc.read_h5ad("/home/sarra/brain_subsamples/brain_3000_sample.h5ad")
 
-# optional: set verbosity & plotting style
-sc.settings.verbosity = 3  # show warnings/info
-sc.set_figure_params(figsize=(6, 4), facecolor='white')
 
-# assume you already loaded your data:
-# adata = sc.read_h5ad("...")
-
-# 1. Annotate mitochondrial genes (human: "MT-")
-adata.var["mt"] = adata.var_names.str.startswith("MT-")
 
 # 2. Calculate QC metrics: total counts, number of genes, percent mito, etc.
 sc.pp.calculate_qc_metrics(
@@ -147,12 +162,7 @@ sc.pp.calculate_qc_metrics(
 )
 
 # 3. Plot QC metrics to inspect data and choose thresholds
-sc.pl.violin(
-    adata,
-    ["n_genes_by_counts", "total_counts", "pct_counts_mt"],
-    jitter=0.4,
-    multi_panel=True
-)
+
 sc.pl.scatter(
     adata,
     x="total_counts",
