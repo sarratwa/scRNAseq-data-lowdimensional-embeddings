@@ -64,6 +64,11 @@ sc.pp.filter_genes(adata, min_cells=3)
 # ----- Normalization + log-transform ---------------------
 # each cell is scaled to have 10k total counts to remove difference in sequencing depth
 # target sum here 1r4 = 10k is just a random number in order to scale to the same total
+# different normalisation -> incremental pca should not care about the feature names -> possibly some gene have the same name ? 
+# which genes symbole are there twice. 
+# which renaming caused the duplication
+# go back to the duplication reason 
+# coloumn names should be unique and this should not bother torchdr nor should it care about it
 sc.pp.normalize_total(adata, target_sum=1e4)
 # the log transformation compresses extreme value -> make distribution more Gaussian
 sc.pp.log1p(adata)
@@ -120,6 +125,8 @@ sc.pp.scale(adata, max_value=10)
 
 # ------ PCA -------------
 # we reduce these thousand of genes to components
+# what does the package does underneath?
+# should be done manually? 
 sc.tl.pca(adata, svd_solver='arpack')
 # pca scatter plot
 sc.pl.pca(adata, color=None)

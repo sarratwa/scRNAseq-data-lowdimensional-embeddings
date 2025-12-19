@@ -11,6 +11,7 @@ import tiledbsoma as soma
 
 # --------- Data sampling of 3000 cells -----------------
 # --------- Runtime : 25 minutes --------------------
+# track memory usage 
 '''
 OUTPUT_DIR = Path("data/raw")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)

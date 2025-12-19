@@ -22,6 +22,9 @@ if "X_pca" not in adata.obsm:
     sc.tl.pca(adata, n_comps=50, svd_solver="arpack")
 
 # --------- Prepare PCA imput ------------
+# i should not be working with the pca in the preprocessing file
+# the data should recalculate the same output of the preprocessing -> transformed and normalised and not pca
+# this was running a pca on a pca -> change this
 X = adata.obsm["X_pca"][:, :30].astype(np.float32)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -33,6 +36,8 @@ X_t = torch.from_numpy(X).to(device)
 
 # --------- Prepare data matrix --------------------
 # Use log-normalized expression
+# data orientation? plot cells and not pca for genes
+# 
 X = adata.X.toarray() if hasattr(adata.X, "toarray") else adata.X
 X = X.astype(np.float32)
 
