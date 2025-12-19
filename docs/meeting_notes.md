@@ -523,10 +523,117 @@ Each entry records feedback, decisions, and agreed action items.
 ## Meeting – 18-12-2025
 
 **Focus of meeting**
-- 
+- TorchDR integration and PCA handling
+- Normalization & feature names
+- Final report structure 
 
 **What I presented**
-- 
+- Updated preprocessing pipeline
+- Correlations between principal components and QC metrics (mitochondrial percentage, gene counts).
+- Neighborhood graphs UMAP and t-SNE embeddings for exploratory analysis.
+- Initial TorchDR workflow
+- A draft of the structure for the final report.
 
 **Supervisor feedback**
-- 
+- In dr.py, PCA was applied on top of an already computed PCA (X_pca).
+- This resulted in a PCA-on-PCA workflow, which is conceptually wrong.
+- TorchDR (including IncrementalPCA) must operate on the log-normalized gene expression matrix, not on PCA embeddings.
+- Correct principle
+    - Preprocessing step:
+        - Normalization
+        - Log-transformation
+        - HVG selection
+        - scaling
+    - Dimensionality reduction step:
+        - Classical PCA (Scanpy)
+        - Incremental PCA (TorchDR)
+    - These are alternative DR paths, not sequential ones.
+- Decoupled preprocessing and DR:
+    - preprocessing.py ends with a clean, processed adata
+    - dr.py is responsible only for DR methods
+    - TorchDR now receives:
+        - adata.X (log-normalized, optionally HVG-filtered)
+        - not adata.obsm["X_pca"]
+- Normalization & feature names
+    - Incremental PCA does not care about feature (gene) names, only about the numeric matrix.
+    - Duplicate gene symbols are not a mathematical issue for PCA, but they are a data-structure issue in AnnData.
+    - feature_name was used both as:
+        - adata.var.index
+        - and a column in adata.var
+        - With conflicting values.
+    - resolution was adata.var.rename which resolved the AnnData contraints
+    - TorchDR itself was not the root cause, but exposed the inconsistency later in the pipeline.
+    - Why did this conflict surface during DR and not earlier?
+        - Code needs minor revision to ensure:
+        - var_names are finalized before downstream steps.
+- Scope and scaling: 
+    - Do not scale beyond ~10k cells at this stage.
+    - Focus is:
+        - Conceptual correctness
+        - Comparison between:
+            - Classical PCA (Scanpy)
+            - Incremental PCA (TorchDR)
+        - Large-scale benchmarking can be discussed conceptually rather than executed fully.
+- Must add: track memory usage for most steps in the piepline.
+- env.yml must be cleaned up
+- Final Report structure:
+    - Structure is sound but the focus should be:
+        - Methodological reasoning
+            - Why each preprocessing and dimensionality reduction step exists
+            - What assumptions each method makes
+        - Pipeline decisions
+            - Why PCA is used
+            - Why incremental PCA is introduced
+            - Why TorchDR is relevant for scalability
+        - Limitations and trade-offs
+            - Memory vs accuracy
+            - Batch processing vs full-matrix methods
+            - CPU vs GPU execution
+    - Introduction and background can be merged
+    - Biological interpretation should have a supportive role: 
+        - Used only to validate or illustrate methodological choices
+        - Not used to make novel biological claims
+        - Cell types, disease labels, and QC metrics serve as sanity checks, not conclusions
+    - Introduction: Do not oversell biological discoveries. Focus on:
+        - Explosion of single-cell sequencing technologies
+        - Resulting data volume and metadata complexity
+        - Why dimensionality reduction is a computational necessity, not a visualization trick
+        - Keep in intro:
+            - Sequencing technologies → massive datasets
+            - CELLxGENE Census → standardized access to large-scale data
+            - Core problem: data no longer fits into memory → algorithms must adapt
+            - Data availability (CELLxGENE)
+            - Data standards (AnnData / .h5ad)
+            - Computational challenge (scale, memory, batch processing)
+    - github repo: env.yml must be changed because it s a dump rn
+    - Stick to one dataset
+        - Do not try to impress with size
+        - TorchDR should be dataset-agnostic
+        - Scalability argument is theoretical + empirical, not look how big
+    - This section is good but needs clear justification per step:
+        - QC thresholds (why 200 genes, why 5% mt)
+        - Normalization (why total-count normalization)
+        - Log transform (distributional reasons)
+        - HVG selection (why dimensionality reduction depends on variance)
+    - All of the plots for hvgs and qc metrics are more introductory, the main focus is pca and incremental pca, and the main  plots is the comparasion between them.
+        - UMAP is not a result
+        - UMAP is context / motivation
+        - PCA is the real workhorse
+    - Show:
+        - Incremental PCA
+        - Batch-wise computation
+        - GPU memory constraints
+        - Same mathematical goal, different computational strategy
+    - In discussion show: 
+        - PCA is not about plots
+        - PCA is a foundational preprocessing step for:
+        - kNN graphs
+        - clustering
+        - downstream embeddings
+- Presentation suggestion: 5 slides:
+    - PCA is not about plots
+    - PCA is a foundational preprocessing step for:
+    - kNN graphs
+    - clustering
+    - downstream embeddings
+    - extra slides can exist as a backup or answer for further questions.

@@ -216,6 +216,32 @@ and next steps.
 - Use TorchDR and incremental PCA as scalability tools, not black boxes.
 - Demonstrate interpretability, not just implementation.
 
-## After 18-12-2025
+## After 15-12-2025
 
 ### Work done
+- Saved the fully processed dataset to data/processed/brain_preprocessed.h5ad.
+- Evaluated correlations between principal components and QC metrics (mitochondrial percentage, gene counts).
+- Constructed neighborhood graphs and computed UMAP and t-SNE embeddings for exploratory analysis.
+- TorchDR Preparation
+- Implemented initial TorchDR workflow (dr.py) to compare:
+    - Standard PCA
+    - Incremental PCA (TorchDR)
+- Prepare a draft of the structure for the final report.
+
+### Observations / issues
+- Identified an incorrect PCA-on-PCA workflow: During initial TorchDR integration, PCA was mistakenly applied to an already PCA-transformed representation (X_pca). This resulted in a PCA-on-PCA workflow, which is conceptually incorrect, as dimensionality reduction methods must operate on the normalized gene expression space rather than on previously reduced embeddings. The pipeline was subsequently corrected to ensure that both classical PCA (Scanpy) and Incremental PCA (TorchDR) are applied independently to the same preprocessed expression matrix.
+- Incremental PCA and classical PCA are vastly different. Go over code. 
+
+### Next steps
+- Refactor the pipeline to ensure TorchDR operates directly on the log-normalized expression matrix.
+- TorchDR Incremental PCA integrated and under active refinement.
+- establish Classical PCA baseline.
+- Get Preprocessing pipeline to stable and reproducible state.
+- clean comparison between Scanpy PCA and TorchDR Incremental PCA under controlled data sizes.
+- Start writing the final report. 
+
+## After 18-12-2025 (Last meeting took place: deadline is on the 29th)
+
+### Work done
+
+### Observations / issues
