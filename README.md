@@ -86,7 +86,8 @@ All experiments were conducted on a local machine using WSL2 (Ubuntu) with the f
 - CUDA: Version 13.0 (available via WSL2)
 - OS: Windows 11 with Ubuntu (WSL2)
 
-[!NOTE] GPU acceleration was available and used where supported (TorchDR). However, the limited VRAM (4 GB) constrained the maximum dataset size, motivating the use of subsampling and incremental methods.
+> [!NOTE]
+> GPU acceleration was available and used where supported (TorchDR). However, the limited VRAM (4 GB) constrained the maximum dataset size, motivating the use of subsampling and incremental methods.
 
 
 This project uses a Conda-based Python environment.
