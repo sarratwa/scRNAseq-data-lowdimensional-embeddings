@@ -64,10 +64,10 @@ scRNAseq-data-lowdimensional-embeddings/
 
 - [x] Project structure and environment setup  
 - [x] Data loading and metadata inspection  
-- [ ] Exploratory data analysis and QC refinement (in progress) 
-- [ ] PCA-based dimensionality reduction and interpretation (in progress) 
-- [ ] TorchDR integration (planned) 
-- [ ] Large-scale benchmarking (future work) 
+- [X] Exploratory data analysis and QC refinement 
+- [X] PCA-based dimensionality reduction and interpretation
+- [ ] TorchDR integration (in progress) 
+- [ ] Large-scale benchmarking (planned) 
 
 All active development takes place on the `dev` branch. The `main` branch is kept as a clean, stable reference.
 
@@ -86,7 +86,7 @@ All experiments were conducted on a local machine using WSL2 (Ubuntu) with the f
 - CUDA: Version 13.0 (available via WSL2)
 - OS: Windows 11 with Ubuntu (WSL2)
 
--> GPU acceleration was available and used where supported (TorchDR). However, the limited VRAM (4 GB) constrained the maximum dataset size, motivating the use of subsampling and incremental methods.
+[!NOTE] GPU acceleration was available and used where supported (TorchDR). However, the limited VRAM (4 GB) constrained the maximum dataset size, motivating the use of subsampling and incremental methods.
 
 
 This project uses a Conda-based Python environment.
@@ -106,4 +106,4 @@ conda activate census
 ```
 This project uses the CELLxGENE Census as the primary data source for large-scale single-cell RNA-seq datasets.
 - The Census API provides programmatic access to curated scRNA-seq data stored in a cloud-backed TileDB-SOMA format.
-- Please follow the official installation instructions: [https://chanzuckerberg.github.io/cellxgene-census/cellxgene_census_docsite_installation.html]
+- Please follow the [official installation instructions](https://chanzuckerberg.github.io/cellxgene-census/cellxgene_census_docsite_installation.html)
