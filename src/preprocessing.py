@@ -5,7 +5,8 @@ import numpy as np
 # need to limit scaling to hvgs and copy te adata before filtering
 
 # --------- Load Data --------------
-adata = sc.read_h5ad("data/raw/brain_3000_sample.h5ad")
+SAMPLE_SIZE = 10_000 # 3_000 or 10_000
+adata = sc.read_h5ad(f"data/raw/brain_{SAMPLE_SIZE}_sample.h5ad")
 
 # ---- Annotate mitochondrial genes --------------
 # focus on mitochondrial genes mt to indicate cell stress or death -> huge percentage indicates a low-quality cell
@@ -124,4 +125,4 @@ sc.pp.scale(adata, max_value=10)
 # sc.pp.scale(adata[:, adata.var.highly_variable])
 
 # saving the processed data to use ind dr
-adata.write("data/processed/brain_preprocessed.h5ad")
+adata.write(f"data/processed/brain_{SAMPLE_SIZE}_preprocessed.h5ad")

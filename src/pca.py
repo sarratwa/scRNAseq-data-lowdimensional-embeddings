@@ -1,17 +1,40 @@
 import scanpy as sc
 import matplotlib.pyplot as plt
 import numpy as np
+import time
+import psutil
+import os
+
+process = psutil.Process(os.getpid())
+
+# measuring rss: Resident Set Size: how much physical system RAM the operating system has allocated to the Python process
+def cpu_mem_mb():
+    return process.memory_info().rss / 1024**2
 
 # need to limit scaling to hvgs and copy te adata before filtering
 
 # --------- Load Data --------------
-adata = sc.read_h5ad("data/processed/brain_preprocessed.h5ad")
+SAMPLE_SIZE = 3000 # 3000 or 10000
+adata = sc.read_h5ad(f"data/processed/brain_{SAMPLE_SIZE}_preprocessed.h5ad")
+
+#before pca
+mem_before = cpu_mem_mb()
+# start timer
+start = time.perf_counter()
 
 # ------ PCA -------------
 # we reduce these thousand of genes to components
 # what does the package does underneath?
 # should be done manually? 
 sc.tl.pca(adata, svd_solver='arpack')
+
+# stop timer
+pca_time = time.perf_counter() - start
+mem_after = cpu_mem_mb()
+# results
+print(f"Classical PCA time: {pca_time:.2f}s")
+print(f"CPU RAM increase: {mem_after - mem_before:.1f} MB")
+
 # pca scatter plot
 # scanpy hides tick labels by default to keep plots clean for multi-panel layouts.
 sc.pl.pca(
@@ -23,7 +46,7 @@ sc.pl.pca(
 # --------- Variance ratio plot (helps choose n_pcs) --------
 # pc number and the % variance explained
 # which PCs explain little additional variance -> we will use 30 PCs
-sc.pl.pca_variance_ratio(adata, log=True)
+sc.pl.pca_variance_ratio(adata, log=False)
 # these 2 plots are to check if PCs are strongly correlated with mitochondrial %
 sc.pl.pca(adata, color="pct_counts_mt")
 sc.pl.pca(
