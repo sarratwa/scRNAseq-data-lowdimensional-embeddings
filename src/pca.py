@@ -26,7 +26,12 @@ start = time.perf_counter()
 # we reduce these thousand of genes to components
 # what does the package does underneath?
 # should be done manually? 
-sc.tl.pca(adata, svd_solver='arpack')
+sc.tl.pca(
+    adata,
+    svd_solver="arpack",
+    n_comps=30,
+    mask_var="highly_variable"
+)
 
 # stop timer
 pca_time = time.perf_counter() - start

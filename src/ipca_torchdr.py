@@ -108,7 +108,6 @@ explained_var = ipca.explained_variance_ratio_.cpu().numpy()
 pcs = np.arange(1, n_components + 1)
 
 plt.figure(figsize=(6, 4))
-plt.yscale("log")
 plt.plot(
     np.arange(1, n_components + 1),
     explained_var,
@@ -138,8 +137,11 @@ plt.scatter(
     s=5,
     alpha=0.6
 )
-plt.xlabel("IPCA 1")
-plt.ylabel("IPCA 2")
+pc1_pct = explained_var[0] * 100
+pc2_pct = explained_var[1] * 100
+
+plt.xlabel(f"IPCA 1 ({pc1_pct:.2f}%)")
+plt.ylabel(f"IPCA 2 ({pc2_pct:.2f}%)")
 plt.title("Incremental PCA (torchdr)")
 plt.tight_layout()
 plt.show()
