@@ -243,5 +243,101 @@ and next steps.
 ## After 18-12-2025 (Last meeting took place: deadline is on the 29th)
 
 ### Work done
+- Draft2 for paper
+- Draft3 for paper
+- total runtime, peak memory CPU or GPU cuda for pca and ipca and batch size sensitivity for ipca. explained variance ratio? 
+- Data scaling: 3k cells done, now downloading 10k cells, this time sampling runtime, CPU, RAM and final matrix size (cells x genes). this can become a table
 
 ### Observations / issues
+- concerning draft3 must change/improve:
+    - Explicit Research Question: This study investigates whether incremental PCA can reproduce the variance structure of classical PCA while reducing memory requirements under realistic computational constraints. (Introduction)
+    - Explained Variance Results: comparison PCA vs IPCA / a cumulative explained variance plot (PCA vs IPCA), or a small table: PC1–PC10 variance (PCA vs IPCA)
+    - Add memory usage section
+    - Batch sizes that was used in ipca must be explained and described (found in ipca_torchdr.py). Answer questions what batch size did we use and why? 
+    - Add Quantitative PCA Similarity Metric. example: PC1 in PCA vs IPCA
+    - Runtime comparasion: runtime PCA vs IPCA (in result section)
+    - Add UMAP and t-SNE figure
+    - Showing HVGs is not enough, must explain how many HVGs and why were they retained.(preprocessing pipeline)
+    - Add table for preprocessing summary and for PCA vs IPCA comparison
+    - Computational envi description can be improved and add RAM, CPU and GPU specs.
+    - explain how TorchDR is the same math as PCA but different approach: TorchDR does not introduce a new dimensionality reduction objective but implements PCA under a different computational model.
+    - Prof talked about protein coding gene restriction, see what can be done about that
+    - talk about the effect of batches
+    - Explain why PCA is not about plots
+    - Cite the references correctly
+- After running peak memory usagem found that IPCA is slower than PCA (2,52s vs 1.75s). The goal now is to find out when does PCA runs out of memory and becomes slower than IPCA. The idea here is that PCA memory usage increases with the amount of cells whereas IPCA memory usage stays relatively the same. From the testing on the 3k cell dataset, we ve found that smaller batch sizes have been (batchsize:256 , num of batches: 11, runtime: 2.52s / batchsize:512 , num of batches: 6, runtime: 4.10s / batchsize: 1024, num of batches: 3, runtime: 6.43s). A plot would be intersting to see: batch size vs runtime.  
+- Datascaling first attempt failed (30min): Timeout was reached. S3: Failed to read S3 object. 
+- possible solution if second attempt fails: reducing concurency for TileDB-SOMA: allowing TileDB-SOMA to use fewer threads (limit the number of simultaneous remote storage requests). "sm.num_reader_threads": 2
+- second data scaling failed: third datascaling with possible solution implemented.
+- third data scaling failed: curlCode: 28, Timeout was reached. The connection stayed open too long S3 or the network closed it due to a timeout. So reducing concurrency did change much. At ~10k cells, Census downloads are unreliable over standard network connections.
+- Conclusion after 3 failed attempts: the connection stays open too long S3 or this network drops it. the curlcode means The server did not finish sending the data before the connection expired. Trying chunking: downloading the same data, but in several small, independent pieces instead of one big request. https://stackoverflow.com/questions/65130143/how-to-processes-the-extremely-large-dataset-into-chunks-in-python-pandas-whi 
+- chunking also failed: curlCode: 28, Timeout was reached. I attempted to scale data acquisition to 10,000 cells using the CellxGene Census. However, repeated network timeouts occurred due to remote streaming limitations, even when using chunked downloads. Therefore, I focused my benchmarking on a stable 3,000-cell dataset and analyzed memory and runtime behavior of PCA versus incremental GPU-based methods under controlled conditions.
+- retry datascaling for 10k from a home network: 
+    - Unexpectedly, a full download of 10,000 brain cells succeeded when executed from a home network environment, whereas previous attempts on other networks repeatedly failed. The same codebase and query parameters were used, suggesting that the success was not due to a code change but rather to differences in network conditions.
+- specifiy : Gene expression matrices were obtained from the RNA measurement of the CellxGene Census and in preprocessing add: Analyses were restricted to protein-coding genes and identical preprocessing steps were applied across all dataset sizes. Only after implementing it. 
+- PCA vs IPCA memory performance. 
+
+### Observation PCA vs IPCA runtime
+- PCA runtime:
+    - Run1: 3,2s
+    - Run2: 1.2s
+    - Run3: 1,6s
+    - Run4: 1,4s
+    -> First run is slow because CPU cash is empty: The first PCA run exhibits higher runtime due to cold-start overheads such as memory allocation and library initialization. Subsequent runs benefit from cache reuse and show reduced execution times.
+    - Low CPU RAM increase (~28–29 MB)
+- IPCA runtime: 
+    - First run is faster than normal PCA: 2,23s
+    - Run 2, 3 and 4 are ~2.0 s
+    - GPU memory:
+        - allocated ~35 MB
+        - reserved ~98 MB
+        - max_alloc ~65 MB
+    - Batch timing consistent (~170–195 ms)
+- This has a number of implications: 
+    - for small datasets 3k, classical PCA is faster or equal to IPCA
+    - PCA sensitive to cache state
+    - PCA has lower overhead for small N
+    - IPCA has higher constant overhead due to batching, repeated partial SVD updates, GPU memory reservation
+    - IPCA is scalable because: 
+        - batch processing dominates
+        - GPU execution is more deterministic
+        - less reliance on CPU cache state
+    - Memory behavior is fundamentally different   
+        - CPU RAM: PCA:~28 MB / IPCA:minimal
+        - GPU RAM: PCA:none / IPCA:~35–98 MB GPU
+- For moderate scRNA-seq datasets (~3k cells), classical PCA remains efficient. Incremental PCA becomes advantageous primarily in memory-constrained or large-scale settings.
+- reattempting data scaling 19:37
+
+### Observation on the effect of batche sizes in IPCA
+We evaluated batch sizes {256, 512, 1024} (2⁸, 2⁹, 2¹⁰) to probe the tradeoff between per-batch computation cost and the overhead of performing more incremental updates, using standard power-of-two batch sizes commonly used in GPU workloads.
+- Batch size 256:
+    - Total time ≈ 2 s
+    - Mean batch time ≈ 633–649 ms
+    - Batches = 11
+    - GPU memory: allocated ≈ 22 MB, reserved ≈ 98 MB, max_alloc ≈ 65 MB
+- Batch size 512:
+    - Total time ≈ 3.84–3.98 s
+    - Mean batch time ≈ 633–649 ms
+    - Batches = 6
+    - GPU memory: allocated ≈ 34.6 MB, reserved ≈ 104 MB, max_alloc ≈ 83.5 MB
+- Batch size 1024: 
+    - Total time ≈ 5.90–5.98 s
+    - Total time ≈ 5.90–5.98 s
+    - batches = 3
+    - GPU memory increased: allocated ≈ 42.4 MB, reserved ≈ 170 MB, max_alloc ≈ 137 MB
+
+### Observation on performance of IPCA on a 3k vs 10k cells dataset
+- Classical PCA:
+    - Classical PCA time: 4.25s
+    - CPU RAM increase: 44.0 MB
+- IPCA: batchsize=1024
+    - Incremental PCA time: 30.57s
+    - Number of batches: 10
+    - Mean batch time: 3049.09 ms
+    - After IPCA fit | allocated=84.1 MB | reserved=292.0 MB | max_alloc=201.9 MB
+- IPCA: batchsize=256
+    - After IPCA fit | allocated=83.5 MB | reserved=252.0 MB | max_alloc=201.3 MB
+    - Total IPCA time: 6.65s
+    - Mean batch time: 177.65 ms
+    - Number of batches: 37
+- The successful download enabled benchmarking of both classical PCA and incremental PCA on a 10k-cell dataset. This larger dataset revealed clear scaling effects: classical PCA remained faster as long as the dataset fit in CPU memory, while incremental PCA exhibited substantially higher runtime due to batching and GPU overhead, but with predictable and bounded memory behavior. These results reinforce the conclusion that incremental PCA is primarily advantageous in memory-constrained or larger-scale settings, rather than as a drop-in faster alternative for moderate dataset sizes.
