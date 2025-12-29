@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # -------- Load data --------
-adata = sc.read_h5ad("/home/sarra/scRNAseq-data-lowdimensional-embeddings/data/processed/brain_3000_sample.h5ad")
+# only after running load_data.py and obtaining the h5ad file of the data
+adata = sc.read_h5ad("data/raw/brain_3000_sample.h5ad")
 
 print("============================================")
 print("DATASET SUMMARY")
@@ -17,16 +18,18 @@ print(f"Metadata columns: {list(adata.obs.columns)}")
 print(f"Gene annotation columns: {list(adata.var.columns)}")
 print("============================================\n")
 
-# -------- Cell type distribution --------
+# -------- Tissue distribution (QC) --------
 if "tissue" in adata.obs.columns:
     tissue_counts = adata.obs["tissue"].value_counts()
-    print("Tissue distribution:")
+
+    print("Tissue distribution (full table):")
     print(tissue_counts)
+
 else:
     tissue_counts = None
 
-# -------- Top genes by mean expression --------
 
+# -------- Top genes by mean expression --------
 # Convert mean to 1D array
 gene_means = np.asarray(adata.X.mean(axis=0)).ravel()
 
@@ -38,17 +41,30 @@ print("\nTop 10 detected genes (by mean expression):")
 for g in top_genes:
     print(" -", g)
 
-# -------- Plot: Tissue distribution bar chart --------
+
+# -------- Plot: Tissue distribution (Top N + Other) --------
 if tissue_counts is not None:
-    plt.figure(figsize=(7,4))
-    tissue_counts.plot(kind="bar", color="steelblue")
-    plt.title("Cell Tissue Distribution")
-    plt.ylabel("Number of Cells")
-    plt.xticks(rotation=45, ha="right")
+    N_TOP = 30  # number of tissues to show
+
+    top_tissues = tissue_counts.head(N_TOP)
+    other_count = tissue_counts.iloc[N_TOP:].sum()
+
+    plot_counts = top_tissues.copy()
+    plot_counts["Other"] = other_count
+
+    plt.figure(figsize=(6, 5))
+    plot_counts.sort_values().plot(
+        kind="barh",
+        color="steelblue"
+    )
+
+    plt.xlabel("Number of Cells")
+    plt.title(f"Cell distribution by tissue (top {N_TOP})")
     plt.tight_layout()
     plt.show()
 
-# -------- Table view for screenshot --------
+
+# -------- Table view --------
 summary_table = pd.DataFrame({
     "Metric": ["Cells", "Genes", "Matrix Type", "Metadata Columns"],
     "Value": [adata.n_obs, adata.n_vars, type(adata.X).__name__, len(adata.obs.columns)]
