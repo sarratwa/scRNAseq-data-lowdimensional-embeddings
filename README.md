@@ -27,11 +27,7 @@ The analysis follows a standard scRNA-seq workflow:
 8. Non-linear embeddings (UMAP)  
 9. Exploratory integration of TorchDR for scalable dimensionality reduction  
 
-At the current stage, emphasis is placed on validating steps 1–6 before scaling experiments.
-
 ## Repository Structure
-
-The structure is being updated as i progress, so this is not the final overview
 
 ```
 scRNAseq-data-lowdimensional-embeddings/
@@ -41,20 +37,27 @@ scRNAseq-data-lowdimensional-embeddings/
 ├── data/                  
 │   ├── raw/
 │   └── processed/
-├── notebooks/             
-│   ├── 01_load_and_eda.ipynb
-│   ├── 02_qc_preprocess.ipynb
-│   └── 03_pca_umap_torchdr.ipynb
 ├── src/
 │   ├── __init__.py
 │   ├── load_data.py
 │   ├── dataset_summary.py
 │   ├── preprocessing.py
-│   └── dr.py
+│   ├── pca.py
+│   ├── ipca_torchdr.py
+│   └── variance_comparison.py
 ├── figures/
-│   ├── qc_*.png
-│   ├── pca_*.png
-│   └── umap_*.png
+│   ├── qc_metrics.png
+│   ├── PCA_pct_counts_mt.png
+│   ├── PCA1v2_pct_count_mt_PCA3v4_n_genes.png
+│   ├── HVG.png
+│   ├── celldistributionbytissue.png
+│   ├── pca/diagnostics/variance_ratio.png
+│   ├── pca/projections/pca_scanpy.png
+│   ├── ipca/diagnostics/varianceplot_ipca.png
+│   ├── ipca/projections/ipca_torchdr.png
+│   ├── Cumulative_explained_variance_PCAvsIPCA.png
+│   ├── UMAP.png
+│   └── t-SNE.png
 └── docs/
     ├── progress_log.md
     └── meeting_notes.md
@@ -66,7 +69,7 @@ scRNAseq-data-lowdimensional-embeddings/
 - [x] Data loading and metadata inspection  
 - [X] Exploratory data analysis and QC refinement 
 - [X] PCA-based dimensionality reduction and interpretation
-- [ ] TorchDR integration (in progress) 
+- [X] TorchDR integration
 - [ ] Large-scale benchmarking (planned) 
 
 All active development takes place on the `dev` branch. The `main` branch is kept as a clean, stable reference.
@@ -89,6 +92,7 @@ All experiments were conducted on a local machine using WSL2 (Ubuntu) with the f
 > [!NOTE]
 > GPU acceleration was available and used where supported (TorchDR). However, the limited VRAM (4 GB) constrained the maximum dataset size, motivating the use of subsampling and incremental methods.
 
+## Environment Setup
 
 This project uses a Conda-based Python environment.
 
@@ -105,6 +109,9 @@ To recreate the environment:
 conda env create -f environment.yml
 conda activate census
 ```
+
+## Data Source
+
 This project uses the CELLxGENE Census as the primary data source for large-scale single-cell RNA-seq datasets.
 - The Census API provides programmatic access to curated scRNA-seq data stored in a cloud-backed TileDB-SOMA format.
 - Please follow the [official installation instructions](https://chanzuckerberg.github.io/cellxgene-census/cellxgene_census_docsite_installation.html)
