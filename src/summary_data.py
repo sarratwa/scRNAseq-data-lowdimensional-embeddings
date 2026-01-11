@@ -74,3 +74,23 @@ print("\n============================================")
 print("Summary Table")
 print("============================================")
 print(summary_table)
+
+
+# pick small slices
+n_genes_show = 16
+n_cells_show = 16
+
+gene_idx = np.random.choice(adata.n_vars, n_genes_show, replace=False)
+cell_idx = np.random.choice(adata.n_obs, n_cells_show, replace=False)
+
+# extract values
+matrix_block = adata.X[cell_idx][:, gene_idx].toarray()
+
+# create DataFrame for display
+df_block = pd.DataFrame(
+    matrix_block,
+    index=[f"Gene_{i}" for i in range(n_genes_show)],
+    columns=[f"Cell_{j}" for j in range(n_cells_show)]
+)
+
+print(df_block)
