@@ -14,7 +14,7 @@ def cpu_mem_mb():
 # need to limit scaling to hvgs and copy te adata before filtering
 
 # --------- Load Data --------------
-SAMPLE_SIZE = 3000 # 3000 or 10000
+SAMPLE_SIZE = 10000 # 3000 or 10000
 adata = sc.read_h5ad(f"data/processed/brain_{SAMPLE_SIZE}_preprocessed.h5ad")
 
 #before pca

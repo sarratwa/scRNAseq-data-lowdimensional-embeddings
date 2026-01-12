@@ -20,7 +20,7 @@ def gpu_mem(prefix=""):
         )
 
 # ---------- Load preprocessed data -----------
-SAMPLE_SIZE = 3000 # 3000 or 10000
+SAMPLE_SIZE = 10000 # 3000 or 10000
 adata = sc.read_h5ad(f"data/processed/brain_{SAMPLE_SIZE}_preprocessed.h5ad")
 
 # Make sure we only use HVGs
@@ -59,7 +59,7 @@ ipca = IncrementalPCA(
 )
 
 # Fit in batches but this hides batch times
-# ipca.fit(X_torch)
+ipca.fit(X_torch)
 
 # batch-timed IPCA implementation
 for start_idx in range(0, X_torch.shape[0], batch_size):
@@ -77,11 +77,14 @@ for start_idx in range(0, X_torch.shape[0], batch_size):
     torch.cuda.synchronize()
     batch_times.append(time.perf_counter() - t0)
 
+
 # Transform full dataset
 X_ipca = ipca.transform(X_torch)
 
 # Move result back to CPU for numpy / scanpy
 X_ipca = X_ipca.cpu().numpy()
+
+
 
 # stop timer
 ipca_time = time.perf_counter() - start_total
@@ -99,7 +102,7 @@ print(f"Number of batches: {len(batch_times)}")
 gpu_mem("After IPCA fit")
 
 # Store results in AnnData (Scanpy-compatible)
-adata.obsm["X_ipca_torchdr"] = X_ipca
+#adata.obsm["X_ipca_torchdr"] = X_ipca
 
 
 # --------- Variance explained --------------------
